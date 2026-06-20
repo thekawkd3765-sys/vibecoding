@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Timer</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080a0f;
+      --text: #f8fbff;
+      --muted: #aeb8c8;
+      --line: rgba(255, 255, 255, 0.18);
+      --glass: rgba(255, 255, 255, 0.105);
+      --glass-strong: rgba(255, 255, 255, 0.18);
+      --glass-shadow: rgba(1, 4, 10, 0.55);
+      --shine: rgba(255, 255, 255, 0.72);
+      --focus: #ff5c7a;
+      --focus-soft: rgba(255, 92, 122, 0.24);
+      --break: #42d6a4;
+      --break-soft: rgba(66, 214, 164, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 92, 122, 0.14), transparent 30%),
+        linear-gradient(315deg, rgba(66, 214, 164, 0.13), transparent 32%),
+        linear-gradient(180deg, #111626 0%, #080a0f 54%, #0d1415 100%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(110deg, transparent 0 18%, rgba(255, 255, 255, 0.08) 22%, transparent 29% 100%),
+        linear-gradient(73deg, transparent 0 48%, rgba(255, 255, 255, 0.05) 52%, transparent 60% 100%);
+      mix-blend-mode: screen;
+      opacity: 0.72;
+    }
+
+    main {
+      width: min(100%, 460px);
+    }
+
+    .timer-shell {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      width: 100%;
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.22), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.055)),
+        rgba(18, 22, 31, 0.54);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.42),
+        inset 0 -24px 54px rgba(255, 255, 255, 0.035),
+        0 30px 90px var(--glass-shadow);
+      backdrop-filter: blur(28px) saturate(150%);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+    }
+
+    .timer-shell::before,
+    .timer-shell::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .timer-shell::before {
+      inset: 1px;
+      border-radius: 21px;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.4), transparent 18% 74%, rgba(255, 255, 255, 0.12)),
+        linear-gradient(245deg, rgba(255, 92, 122, 0.16), transparent 36%, rgba(66, 214, 164, 0.14));
+      opacity: 0.74;
+    }
+
+    .timer-shell::after {
+      inset: -45% -30% auto;
+      height: 72%;
+      background: linear-gradient(100deg, transparent 8%, rgba(255, 255, 255, 0.22) 44%, transparent 72%);
+      transform: rotate(-7deg);
+      opacity: 0.55;
+    }
+
+    .timer-shell > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .session-count {
+      min-width: 58px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 8px 24px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      min-height: 48px;
+      margin-bottom: 30px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.04)),
+        rgba(0, 0, 0, 0.12);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .mode-button {
+      border: 0;
+      border-radius: 12px;
+      color: var(--muted);
+      background: transparent;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .mode-button:hover {
+      color: var(--text);
+    }
+
+    .mode-button.active {
+      color: var(--text);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06)),
+        var(--focus-soft);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 10px 26px rgba(255, 92, 122, 0.16);
+    }
+
+    .timer-shell.break-mode .mode-button.active {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.06)),
+        var(--break-soft);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 10px 26px rgba(66, 214, 164, 0.14);
+    }
+
+    .time-wrap {
+      display: grid;
+      place-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .time {
+      width: 100%;
+      min-height: 116px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      font-size: clamp(4.4rem, 20vw, 6.3rem);
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0;
+      text-align: center;
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.22),
+        0 18px 48px rgba(0, 0, 0, 0.34);
+    }
+
+    .progress-track {
+      position: relative;
+      width: 100%;
+      height: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+        rgba(0, 0, 0, 0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+        0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .progress-track::before {
+      content: "";
+      position: absolute;
+      inset: 1px 0 auto;
+      height: 45%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+      opacity: 0.56;
+    }
+
+    .progress-bar {
+      position: relative;
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 46%),
+        linear-gradient(90deg, #ffb067, var(--focus));
+      box-shadow:
+        0 0 26px rgba(255, 92, 122, 0.46),
+        inset 0 1px 0 rgba(255, 255, 255, 0.58);
+      transition: width 240ms linear;
+    }
+
+    .progress-bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 0 34%, rgba(255, 255, 255, 0.42) 48%, transparent 62% 100%);
+      opacity: 0.72;
+    }
+
+    .timer-shell.break-mode .progress-bar {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 46%),
+        linear-gradient(90deg, #6ce2ff, var(--break));
+      box-shadow:
+        0 0 26px rgba(66, 214, 164, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.58);
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      min-height: 52px;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .control-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--text);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.045)),
+        rgba(255, 255, 255, 0.055);
+      font: inherit;
+      font-size: 0.94rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.26),
+        0 10px 26px rgba(0, 0, 0, 0.16);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .control-button:hover {
+      border-color: rgba(255, 255, 255, 0.34);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.19), rgba(255, 255, 255, 0.07)),
+        rgba(255, 255, 255, 0.075);
+      transform: translateY(-1px);
+    }
+
+    .control-button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      border-color: rgba(255, 255, 255, 0.28);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 48%),
+        linear-gradient(135deg, #ffb067, var(--focus));
+      color: #19060b;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.58),
+        0 16px 38px rgba(255, 92, 122, 0.28);
+    }
+
+    .primary:hover {
+      border-color: rgba(255, 255, 255, 0.36);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), transparent 48%),
+        linear-gradient(135deg, #ffc084, #ff7890);
+    }
+
+    .timer-shell.break-mode .primary {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 48%),
+        linear-gradient(135deg, #6ce2ff, var(--break));
+      color: #03150f;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.58),
+        0 16px 38px rgba(66, 214, 164, 0.24);
+    }
+
+    .timer-shell.break-mode .primary:hover {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), transparent 48%),
+        linear-gradient(135deg, #8becff, #69e3b9);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .pause-icon {
+      display: none;
+    }
+
+    .is-running .play-icon {
+      display: none;
+    }
+
+    .is-running .pause-icon {
+      display: block;
+    }
+
+    @media (max-width: 430px) {
+      body {
+        padding: 16px;
+      }
+
+      .timer-shell {
+        padding: 22px;
+      }
+
+      header {
+        margin-bottom: 22px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="timer-shell" id="timerShell" aria-label="뽀모도로 타이머">
+      <header>
+        <h1>Pomodoro</h1>
+        <div class="session-count" id="sessionCount" aria-live="polite">0회</div>
+      </header>
+
+      <div class="mode-tabs" role="tablist" aria-label="타이머 모드">
+        <button class="mode-button active" id="focusMode" type="button" role="tab" aria-selected="true">집중 25분</button>
+        <button class="mode-button" id="breakMode" type="button" role="tab" aria-selected="false">휴식 5분</button>
+      </div>
+
+      <div class="time-wrap">
+        <div class="status" id="statusText" aria-live="polite">집중 시간</div>
+        <div class="time" id="timeDisplay">25:00</div>
+        <div class="progress-track" aria-label="진행률">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="control-button primary" id="startStop" type="button">
+          <svg class="icon play-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+          <svg class="icon pause-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 5v14"></path>
+            <path d="M15 5v14"></path>
+          </svg>
+          <span id="startStopText">시작</span>
+        </button>
+        <button class="control-button" id="stopButton" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 7h10v10H7z"></path>
+          </svg>
+          <span>정지</span>
+        </button>
+        <button class="control-button" id="resetButton" type="button">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 4v6h6"></path>
+            <path d="M20 12a8 8 0 1 1-2.34-5.66L4 10"></path>
+          </svg>
+          <span>리셋</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DURATIONS = {
+      focus: 25 * 60,
+      break: 5 * 60
+    };
+
+    const timerShell = document.getElementById("timerShell");
+    const focusMode = document.getElementById("focusMode");
+    const breakMode = document.getElementById("breakMode");
+    const statusText = document.getElementById("statusText");
+    const timeDisplay = document.getElementById("timeDisplay");
+    const progressBar = document.getElementById("progressBar");
+    const startStop = document.getElementById("startStop");
+    const startStopText = document.getElementById("startStopText");
+    const stopButton = document.getElementById("stopButton");
+    const resetButton = document.getElementById("resetButton");
+    const sessionCount = document.getElementById("sessionCount");
+
+    let mode = "focus";
+    let remainingSeconds = DURATIONS.focus;
+    let timerId = null;
+    let completedFocusSessions = 0;
+    let audioContext = null;
+
+    function formatTime(totalSeconds) {
+      const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+      const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function render() {
+      const duration = DURATIONS[mode];
+      const elapsed = duration - remainingSeconds;
+      const progress = Math.min(100, Math.max(0, (elapsed / duration) * 100));
+
+      timeDisplay.textContent = formatTime(remainingSeconds);
+      progressBar.style.width = `${progress}%`;
+      statusText.textContent = mode === "focus" ? "집중 시간" : "휴식 시간";
+      sessionCount.textContent = `${completedFocusSessions}회`;
+      startStopText.textContent = timerId ? "일시정지" : "시작";
+
+      timerShell.classList.toggle("break-mode", mode === "break");
+      timerShell.classList.toggle("is-running", Boolean(timerId));
+      focusMode.classList.toggle("active", mode === "focus");
+      breakMode.classList.toggle("active", mode === "break");
+      focusMode.setAttribute("aria-selected", mode === "focus");
+      breakMode.setAttribute("aria-selected", mode === "break");
+      document.title = `${formatTime(remainingSeconds)} - ${mode === "focus" ? "Focus" : "Break"}`;
+    }
+
+    function chime() {
+      audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(mode === "focus" ? 740 : 520, audioContext.currentTime);
+      gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.22, audioContext.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.55);
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.6);
+    }
+
+    function setMode(nextMode) {
+      pauseTimer();
+      mode = nextMode;
+      remainingSeconds = DURATIONS[mode];
+      render();
+    }
+
+    function completeCurrentMode() {
+      pauseTimer();
+      chime();
+
+      if (mode === "focus") {
+        completedFocusSessions += 1;
+        mode = "break";
+      } else {
+        mode = "focus";
+      }
+
+      remainingSeconds = DURATIONS[mode];
+      render();
+    }
+
+    function tick() {
+      remainingSeconds -= 1;
+
+      if (remainingSeconds <= 0) {
+        remainingSeconds = 0;
+        render();
+        completeCurrentMode();
+        return;
+      }
+
+      render();
+    }
+
+    function startTimer() {
+      if (timerId) {
+        return;
+      }
+
+      timerId = window.setInterval(tick, 1000);
+      render();
+    }
+
+    function pauseTimer() {
+      if (!timerId) {
+        return;
+      }
+
+      window.clearInterval(timerId);
+      timerId = null;
+      render();
+    }
+
+    function stopTimer() {
+      pauseTimer();
+      remainingSeconds = DURATIONS[mode];
+      render();
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      mode = "focus";
+      remainingSeconds = DURATIONS.focus;
+      completedFocusSessions = 0;
+      render();
+    }
+
+    startStop.addEventListener("click", () => {
+      if (timerId) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    stopButton.addEventListener("click", stopTimer);
+    resetButton.addEventListener("click", resetTimer);
+    focusMode.addEventListener("click", () => setMode("focus"));
+    breakMode.addEventListener("click", () => setMode("break"));
+
+    render();
+  </script>
+</body>
+</html>
