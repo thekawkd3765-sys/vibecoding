@@ -32,3 +32,6 @@ coverage/
 # Local automation/config directories
 .agents/
 .codex/
+
+.vercel
+.env*
