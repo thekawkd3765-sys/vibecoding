@@ -64,6 +64,10 @@
       box-sizing: border-box;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
     html {
       min-height: 100%;
     }
@@ -165,6 +169,8 @@
     }
 
     .add-form,
+    input[type="email"],
+    input[type="password"],
     input[type="text"],
     .tracker-panel,
     .week-header,
@@ -186,6 +192,78 @@
     .app-shell {
       display: grid;
       gap: 22px;
+    }
+
+    .auth-shell {
+      min-height: calc(100vh - 108px);
+      display: grid;
+      place-items: center;
+    }
+
+    .auth-panel {
+      width: min(100%, 460px);
+      display: grid;
+      gap: 18px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.16));
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(24px) saturate(155%);
+      -webkit-backdrop-filter: blur(24px) saturate(155%);
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .auth-tab {
+      min-height: 42px;
+      padding: 0 12px;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .auth-tab:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text);
+      filter: none;
+      box-shadow: none;
+    }
+
+    .auth-tab[aria-selected="true"] {
+      background: linear-gradient(135deg, var(--rose), var(--violet) 58%, var(--aqua));
+      color: white;
+      box-shadow: 0 12px 24px rgba(157, 92, 255, 0.2);
+    }
+
+    .auth-fields {
+      display: grid;
+      gap: 10px;
+    }
+
+    .auth-fields label {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
     }
 
     .header {
@@ -224,6 +302,59 @@
       line-height: 1.6;
     }
 
+    .account-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .account-email {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .sign-out-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      background: var(--surface-soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .sign-out-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: var(--violet-dark);
+      filter: none;
+      box-shadow: none;
+    }
+
+    .status-message {
+      margin: 0;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: blur(18px) saturate(145%);
+      -webkit-backdrop-filter: blur(18px) saturate(145%);
+    }
+
+    .status-message[data-state="error"] {
+      border-color: rgba(255, 125, 170, 0.46);
+      color: var(--rose);
+      background: rgba(255, 125, 170, 0.12);
+    }
+
     .add-form {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -246,6 +377,8 @@
       white-space: nowrap;
     }
 
+    input[type="email"],
+    input[type="password"],
     input[type="text"] {
       width: 100%;
       min-height: 52px;
@@ -260,10 +393,14 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
 
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
     input[type="text"]::placeholder {
       color: var(--muted);
     }
 
+    input[type="email"]:focus,
+    input[type="password"]:focus,
     input[type="text"]:focus {
       box-shadow: 0 0 0 3px rgba(255, 125, 170, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.38);
     }
@@ -291,6 +428,14 @@
     button:active {
       transform: translateY(0);
       box-shadow: none;
+    }
+
+    button:disabled,
+    input:disabled,
+    .day-check:disabled {
+      cursor: not-allowed;
+      opacity: 0.64;
+      transform: none;
     }
 
     button:focus-visible,
@@ -489,6 +634,7 @@
 
     @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
       .header,
+      .auth-panel,
       .add-form,
       .tracker-panel,
       .theme-toggle {
@@ -496,6 +642,7 @@
       }
 
       body.theme-dark .header,
+      body.theme-dark .auth-panel,
       body.theme-dark .add-form,
       body.theme-dark .tracker-panel,
       body.theme-dark .theme-toggle {
@@ -510,6 +657,19 @@
 
       .header {
         padding: 20px;
+      }
+
+      .auth-shell {
+        min-height: calc(100vh - 100px);
+      }
+
+      .auth-panel {
+        padding: 22px;
+      }
+
+      .account-bar {
+        align-items: stretch;
+        flex-direction: column;
       }
 
       h1 {
@@ -599,11 +759,42 @@
     </svg>
   </button>
   <main>
-    <section class="app-shell" aria-label="&#49845;&#44288; &#53944;&#47000;&#52964;">
+    <section id="authScreen" class="auth-shell" aria-label="&#47196;&#44536;&#51064;">
+      <section class="auth-panel">
+        <div>
+          <p class="eyebrow">Weekly Habit Tracker</p>
+          <h1>&#49845;&#44288; &#53944;&#47000;&#52964;</h1>
+        </div>
+
+        <form id="authForm" class="auth-form">
+          <div class="auth-tabs" role="tablist" aria-label="&#51064;&#51613; &#48169;&#49885;">
+            <button class="auth-tab" type="button" data-auth-mode="login" role="tab" aria-selected="true">&#47196;&#44536;&#51064;</button>
+            <button class="auth-tab" type="button" data-auth-mode="signup" role="tab" aria-selected="false">&#54924;&#50896;&#44032;&#51077;</button>
+          </div>
+
+          <div class="auth-fields">
+            <label for="authEmail">&#51060;&#47700;&#51068;</label>
+            <input id="authEmail" type="email" placeholder="email@example.com" autocomplete="email" required>
+            <label for="authPassword">&#48708;&#48128;&#48264;&#54840;</label>
+            <input id="authPassword" type="password" placeholder="&#48708;&#48128;&#48264;&#54840;" autocomplete="current-password" minlength="6" required>
+          </div>
+
+          <button id="authSubmitButton" type="submit">&#47196;&#44536;&#51064;</button>
+        </form>
+
+        <p id="authStatusMessage" class="status-message" role="status" hidden></p>
+      </section>
+    </section>
+
+    <section id="appShell" class="app-shell" aria-label="&#49845;&#44288; &#53944;&#47000;&#52964;" hidden>
       <header class="header">
         <p class="eyebrow">Weekly Habit Tracker</p>
         <h1>&#49845;&#44288; &#53944;&#47000;&#52964;</h1>
         <p class="summary">&#50900;&#50836;&#51068;&#48512;&#53552; &#51068;&#50836;&#51068;&#44620;&#51648; &#47588;&#51068;&#51032; &#50756;&#47308; &#50668;&#48512;&#47484; &#46041;&#44536;&#46972;&#48120;&#47196; &#52404;&#53356;&#54616;&#49464;&#50836;.</p>
+        <div class="account-bar">
+          <span id="userEmail" class="account-email"></span>
+          <button id="signOutButton" class="sign-out-btn" type="button">&#47196;&#44536;&#50500;&#50883;</button>
+        </div>
       </header>
 
       <form id="habitForm" class="add-form">
@@ -611,6 +802,8 @@
         <input id="habitInput" type="text" placeholder="&#49352; &#49845;&#44288; &#52628;&#44032;" autocomplete="off" maxlength="40">
         <button type="submit">&#52628;&#44032;</button>
       </form>
+
+      <p id="statusMessage" class="status-message" role="status" hidden></p>
 
       <section class="tracker-panel" aria-label="&#49845;&#44288; &#47532;&#49828;&#53944;">
         <div class="week-header" aria-hidden="true">
@@ -629,67 +822,95 @@
       </section>
     </section>
   </main>
+  <script type='module'>
+    import { createClient } from '@supabase/supabase-js';
 
-  <script>
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const habitsTable = 'habits';
+
     const days = [
-      { key: "mon", short: "\uC6D4", label: "\uC6D4\uC694\uC77C" },
-      { key: "tue", short: "\uD654", label: "\uD654\uC694\uC77C" },
-      { key: "wed", short: "\uC218", label: "\uC218\uC694\uC77C" },
-      { key: "thu", short: "\uBAA9", label: "\uBAA9\uC694\uC77C" },
-      { key: "fri", short: "\uAE08", label: "\uAE08\uC694\uC77C" },
-      { key: "sat", short: "\uD1A0", label: "\uD1A0\uC694\uC77C" },
-      { key: "sun", short: "\uC77C", label: "\uC77C\uC694\uC77C" }
+      { key: 'mon', short: '\uC6D4', label: '\uC6D4\uC694\uC77C' },
+      { key: 'tue', short: '\uD654', label: '\uD654\uC694\uC77C' },
+      { key: 'wed', short: '\uC218', label: '\uC218\uC694\uC77C' },
+      { key: 'thu', short: '\uBAA9', label: '\uBAA9\uC694\uC77C' },
+      { key: 'fri', short: '\uAE08', label: '\uAE08\uC694\uC77C' },
+      { key: 'sat', short: '\uD1A0', label: '\uD1A0\uC694\uC77C' },
+      { key: 'sun', short: '\uC77C', label: '\uC77C\uC694\uC77C' }
     ];
 
     function makeId() {
-      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      if (window.crypto && typeof window.crypto.randomUUID === 'function') {
         return window.crypto.randomUUID();
       }
       return `habit-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     }
 
-    const defaultHabits = [
-      { id: makeId(), name: "\uBB3C \uB9C8\uC2DC\uAE30", completed: {} },
-      { id: makeId(), name: "\uC6B4\uB3D9\uD558\uAE30", completed: {} },
-      { id: makeId(), name: "\uB3C5\uC11C\uD558\uAE30", completed: {} }
-    ];
+    function normalizeCompleted(value) {
+      const completed = {};
 
-    const STORAGE_KEY = "habit-tracker-data-v1";
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        days.forEach((day) => {
+          completed[day.key] = Boolean(value[day.key]);
+        });
+      }
+
+      return completed;
+    }
 
     function normalizeHabits(value) {
       if (!Array.isArray(value)) {
-        return defaultHabits;
+        return [];
       }
 
-      const normalized = value
-        .filter((habit) => habit && typeof habit.name === "string")
+      return value
+        .filter((habit) => habit && typeof habit.name === 'string')
         .map((habit) => ({
-          id: typeof habit.id === "string" ? habit.id : makeId(),
+          id: typeof habit.id === 'string' ? habit.id : makeId(),
           name: habit.name,
-          completed: habit.completed && typeof habit.completed === "object" ? habit.completed : {}
+          completed: normalizeCompleted(habit.completed)
         }));
-
-      return normalized;
     }
 
-    function loadHabits() {
-      try {
-        const stored = window.localStorage.getItem(STORAGE_KEY);
-        return stored ? normalizeHabits(JSON.parse(stored)) : defaultHabits;
-      } catch (error) {
-        return defaultHabits;
-      }
-    }
+    const authScreen = document.getElementById('authScreen');
+    const appShell = document.getElementById('appShell');
+    const authForm = document.getElementById('authForm');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const authSubmitButton = document.getElementById('authSubmitButton');
+    const authModeButtons = Array.from(document.querySelectorAll('[data-auth-mode]'));
+    const authStatusMessage = document.getElementById('authStatusMessage');
+    const userEmail = document.getElementById('userEmail');
+    const signOutButton = document.getElementById('signOutButton');
+    const form = document.getElementById('habitForm');
+    const input = document.getElementById('habitInput');
+    const submitButton = form.querySelector('button[type=submit]');
+    const habitList = document.getElementById('habitList');
+    const themeToggle = document.getElementById('themeToggle');
+    const statusMessage = document.getElementById('statusMessage');
+    const supabase = supabaseUrl && supabaseKey
+      ? createClient(supabaseUrl, supabaseKey, {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
+          }
+        })
+      : null;
 
-    function saveHabits() {
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
-      } catch (error) {
-        // Storage can be unavailable in private or restricted browser contexts.
-      }
-    }
+    const authModeLabels = {
+      login: '\uB85C\uADF8\uC778',
+      signup: '\uD68C\uC6D0\uAC00\uC785'
+    };
 
-    let habits = loadHabits();
+    let authMode = 'login';
+    let currentSession = null;
+    let currentUserId = '';
+    let activeLoadToken = 0;
+    let handledSessionKey = '';
+    let loadingSessionKey = '';
+    let habits = [];
+    let isReady = false;
 
     function getCompletionStats(habit) {
       const completedDays = days.reduce((total, day) => {
@@ -701,16 +922,16 @@
 
     function updateProgress(row, habit) {
       const { percent } = getCompletionStats(habit);
-      const progressText = row.querySelector(".progress-text");
-      const progressTrack = row.querySelector(".progress-track");
-      const progressFill = row.querySelector(".progress-fill");
+      const progressText = row.querySelector('.progress-text');
+      const progressTrack = row.querySelector('.progress-track');
+      const progressFill = row.querySelector('.progress-fill');
 
       if (progressText) {
         progressText.textContent = `\uC774\uBC88 \uC8FC \uB2EC\uC131\uB960 ${percent}%`;
       }
 
       if (progressTrack) {
-        progressTrack.setAttribute("aria-valuenow", percent.toString());
+        progressTrack.setAttribute('aria-valuenow', percent.toString());
       }
 
       if (progressFill) {
@@ -718,20 +939,147 @@
       }
     }
 
-    const form = document.getElementById("habitForm");
-    const input = document.getElementById("habitInput");
-    const habitList = document.getElementById("habitList");
-    const themeToggle = document.getElementById("themeToggle");
+    function setMessage(element, message, state = 'info') {
+      element.textContent = message;
+      element.dataset.state = state;
+      element.hidden = !message;
+    }
 
-    const THEME_KEY = "habit-tracker-theme";
+    function setStatus(message, state = 'info') {
+      setMessage(statusMessage, message, state);
+    }
+
+    function setAuthStatus(message, state = 'info') {
+      setMessage(authStatusMessage, message, state);
+    }
+
+    function setAppReady(nextReady) {
+      isReady = nextReady;
+      input.disabled = !nextReady;
+
+      if (submitButton) {
+        submitButton.disabled = !nextReady;
+      }
+    }
+
+    function setAuthReady(nextReady) {
+      const isDisabled = !nextReady;
+      authEmail.disabled = isDisabled;
+      authPassword.disabled = isDisabled;
+      authSubmitButton.disabled = isDisabled;
+      authModeButtons.forEach((button) => {
+        button.disabled = isDisabled;
+      });
+    }
+
+    function setAuthMode(nextMode) {
+      if (!authModeLabels[nextMode]) {
+        return;
+      }
+
+      authMode = nextMode;
+      authModeButtons.forEach((button) => {
+        const isSelected = button.dataset.authMode === authMode;
+        button.setAttribute('aria-selected', isSelected.toString());
+        button.tabIndex = isSelected ? 0 : -1;
+      });
+      authPassword.autocomplete = authMode === 'signup' ? 'new-password' : 'current-password';
+      authSubmitButton.textContent = authModeLabels[authMode];
+      setAuthStatus('');
+    }
+
+    function setAuthSubmitting(nextSubmitting) {
+      setAuthReady(!nextSubmitting && Boolean(supabase));
+      authSubmitButton.textContent = nextSubmitting ? '\uCC98\uB9AC \uC911...' : authModeLabels[authMode];
+    }
+
+    function getErrorMessage(action, error) {
+      const detail = error && error.message ? ` (${error.message})` : '';
+      return `${action}${detail}`;
+    }
+
+    function requireCurrentUser() {
+      if (!supabase) {
+        throw new Error('Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in .env.local.');
+      }
+
+      if (!currentUserId) {
+        throw new Error('\uB85C\uADF8\uC778\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.');
+      }
+
+      return currentUserId;
+    }
+
+    async function loadHabits() {
+      const userId = requireCurrentUser();
+      const { data, error } = await supabase
+        .from(habitsTable)
+        .select('id, name, completed')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      habits = normalizeHabits(data);
+      renderHabits();
+    }
+
+    async function createHabit(name) {
+      const userId = requireCurrentUser();
+      const { data, error } = await supabase
+        .from(habitsTable)
+        .insert({
+          user_id: userId,
+          name,
+          completed: {}
+        })
+        .select('id, name, completed')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return normalizeHabits([data])[0];
+    }
+
+    async function updateHabitCompletion(habit) {
+      const userId = requireCurrentUser();
+      const { error } = await supabase
+        .from(habitsTable)
+        .update({ completed: habit.completed })
+        .eq('id', habit.id)
+        .eq('user_id', userId);
+
+      if (error) {
+        throw error;
+      }
+    }
+
+    async function deleteHabit(id) {
+      const userId = requireCurrentUser();
+      const { error } = await supabase
+        .from(habitsTable)
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) {
+        throw error;
+      }
+    }
+
+    const THEME_KEY = 'habit-tracker-theme';
     const themeLabels = {
-      dark: "\uB2E4\uD06C\uBAA8\uB4DC\uB85C \uC804\uD658",
-      light: "\uB77C\uC774\uD2B8\uBAA8\uB4DC\uB85C \uC804\uD658"
+      dark: '\uB2E4\uD06C\uBAA8\uB4DC\uB85C \uC804\uD658',
+      light: '\uB77C\uC774\uD2B8\uBAA8\uB4DC\uB85C \uC804\uD658'
     };
 
     function loadThemePreference() {
       try {
-        return window.localStorage.getItem(THEME_KEY) === "dark";
+        return window.localStorage.getItem(THEME_KEY) === 'dark';
       } catch (error) {
         return false;
       }
@@ -739,61 +1087,61 @@
 
     function saveThemePreference(isDark) {
       try {
-        window.localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+        window.localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
       } catch (error) {
         // Storage can be unavailable in private or restricted browser contexts.
       }
     }
 
     function syncThemeButton(isDark) {
-      themeToggle.setAttribute("aria-pressed", isDark.toString());
-      themeToggle.setAttribute("aria-label", isDark ? themeLabels.light : themeLabels.dark);
+      themeToggle.setAttribute('aria-pressed', isDark.toString());
+      themeToggle.setAttribute('aria-label', isDark ? themeLabels.light : themeLabels.dark);
     }
 
     function applyInitialTheme() {
       const isDark = loadThemePreference();
-      document.body.classList.toggle("theme-dark", isDark);
+      document.body.classList.toggle('theme-dark', isDark);
       syncThemeButton(isDark);
     }
 
-    themeToggle.addEventListener("click", () => {
-      const isDark = document.body.classList.toggle("theme-dark");
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('theme-dark');
       syncThemeButton(isDark);
       saveThemePreference(isDark);
     });
 
     applyInitialTheme();
-    const trashIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path></svg>';
+    const trashIcon = '<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-linecap=\'round\' stroke-linejoin=\'round\' aria-hidden=\'true\'><path d=\'M3 6h18\'></path><path d=\'M8 6V4h8v2\'></path><path d=\'M19 6l-1 14H6L5 6\'></path><path d=\'M10 11v5\'></path><path d=\'M14 11v5\'></path></svg>';
 
     function renderHabits() {
-      habitList.innerHTML = "";
+      habitList.innerHTML = '';
 
       habits.forEach((habit) => {
-        const row = document.createElement("article");
-        row.className = "habit-row";
+        const row = document.createElement('article');
+        row.className = 'habit-row';
 
-        const name = document.createElement("div");
-        name.className = "habit-name";
+        const name = document.createElement('div');
+        name.className = 'habit-name';
 
-        const habitTitle = document.createElement("div");
-        habitTitle.className = "habit-title";
+        const habitTitle = document.createElement('div');
+        habitTitle.className = 'habit-title';
         habitTitle.textContent = habit.name;
 
-        const progressSummary = document.createElement("div");
-        progressSummary.className = "progress-summary";
+        const progressSummary = document.createElement('div');
+        progressSummary.className = 'progress-summary';
 
-        const progressText = document.createElement("span");
-        progressText.className = "progress-text";
+        const progressText = document.createElement('span');
+        progressText.className = 'progress-text';
 
-        const progressTrack = document.createElement("div");
-        progressTrack.className = "progress-track";
-        progressTrack.setAttribute("role", "progressbar");
-        progressTrack.setAttribute("aria-label", `${habit.name} \uC774\uBC88 \uC8FC \uB2EC\uC131\uB960`);
-        progressTrack.setAttribute("aria-valuemin", "0");
-        progressTrack.setAttribute("aria-valuemax", "100");
+        const progressTrack = document.createElement('div');
+        progressTrack.className = 'progress-track';
+        progressTrack.setAttribute('role', 'progressbar');
+        progressTrack.setAttribute('aria-label', `${habit.name} \uC774\uBC88 \uC8FC \uB2EC\uC131\uB960`);
+        progressTrack.setAttribute('aria-valuemin', '0');
+        progressTrack.setAttribute('aria-valuemax', '100');
 
-        const progressFill = document.createElement("div");
-        progressFill.className = "progress-fill";
+        const progressFill = document.createElement('div');
+        progressFill.className = 'progress-fill';
 
         progressTrack.appendChild(progressFill);
         progressSummary.appendChild(progressText);
@@ -801,41 +1149,68 @@
         name.appendChild(habitTitle);
         name.appendChild(progressSummary);
 
-        const weekGrid = document.createElement("div");
-        weekGrid.className = "week-grid";
+        const weekGrid = document.createElement('div');
+        weekGrid.className = 'week-grid';
 
         days.forEach((day) => {
-          const cell = document.createElement("div");
-          cell.className = "day-cell";
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
           cell.dataset.day = day.short;
 
-          const checkbox = document.createElement("input");
-          checkbox.className = "day-check";
-          checkbox.type = "checkbox";
+          const checkbox = document.createElement('input');
+          checkbox.className = 'day-check';
+          checkbox.type = 'checkbox';
           checkbox.checked = Boolean(habit.completed[day.key]);
-          checkbox.setAttribute("aria-label", `${habit.name} ${day.label}`);
-          checkbox.addEventListener("change", () => {
-            habit.completed[day.key] = checkbox.checked;
-            saveHabits();
+          checkbox.setAttribute('aria-label', `${habit.name} ${day.label}`);
+          checkbox.addEventListener('change', async () => {
+            const previousCompleted = { ...habit.completed };
+
+            checkbox.disabled = true;
+            habit.completed = { ...habit.completed, [day.key]: checkbox.checked };
             updateProgress(row, habit);
+
+            try {
+              await updateHabitCompletion(habit);
+              setStatus('');
+            } catch (error) {
+              habit.completed = previousCompleted;
+              checkbox.checked = Boolean(previousCompleted[day.key]);
+              updateProgress(row, habit);
+              setStatus(getErrorMessage('\uC644\uB8CC \uC0C1\uD0DC\uB97C \uC800\uC7A5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.', error), 'error');
+              console.error(error);
+            } finally {
+              checkbox.disabled = false;
+            }
           });
 
           cell.appendChild(checkbox);
           weekGrid.appendChild(cell);
         });
 
-        const deleteCell = document.createElement("div");
-        deleteCell.className = "delete-cell";
+        const deleteCell = document.createElement('div');
+        deleteCell.className = 'delete-cell';
 
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "delete-btn";
-        deleteButton.type = "button";
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-btn';
+        deleteButton.type = 'button';
         deleteButton.innerHTML = trashIcon;
-        deleteButton.setAttribute("aria-label", `${habit.name} \uC0AD\uC81C`);
-        deleteButton.addEventListener("click", () => {
+        deleteButton.setAttribute('aria-label', `${habit.name} \uC0AD\uC81C`);
+        deleteButton.addEventListener('click', async () => {
+          const previousHabits = habits;
+
+          deleteButton.disabled = true;
           habits = habits.filter((item) => item.id !== habit.id);
-          saveHabits();
           renderHabits();
+
+          try {
+            await deleteHabit(habit.id);
+            setStatus('');
+          } catch (error) {
+            habits = previousHabits;
+            renderHabits();
+            setStatus(getErrorMessage('\uC2B5\uAD00\uC744 \uC0AD\uC81C\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.', error), 'error');
+            console.error(error);
+          }
         });
 
         deleteCell.appendChild(deleteButton);
@@ -848,24 +1223,242 @@
       });
     }
 
-    form.addEventListener("submit", (event) => {
+    async function enterAuthenticatedState(session) {
+      if (!session || !session.user) {
+        enterSignedOutState();
+        return;
+      }
+
+      const sessionKey = session.access_token || `${session.user.id}-${session.expires_at || ''}`;
+      if ((handledSessionKey === sessionKey && isReady) || loadingSessionKey === sessionKey) {
+        return;
+      }
+
+      loadingSessionKey = sessionKey;
+      const loadToken = activeLoadToken + 1;
+      activeLoadToken = loadToken;
+      currentSession = session;
+      currentUserId = session.user.id;
+      userEmail.textContent = session.user.email || '';
+      authScreen.hidden = true;
+      appShell.hidden = false;
+      setAuthStatus('');
+      setAppReady(false);
+      setStatus('\uC2B5\uAD00 \uB370\uC774\uD130\uB97C Supabase\uC5D0\uC11C \uBD88\uB7EC\uC624\uB294 \uC911\uC785\uB2C8\uB2E4.');
+      habits = [];
+      renderHabits();
+
+      try {
+        await loadHabits();
+        if (loadToken !== activeLoadToken) {
+          return;
+        }
+        handledSessionKey = sessionKey;
+        setStatus('');
+        setAppReady(true);
+        input.focus();
+      } catch (error) {
+        if (loadToken !== activeLoadToken) {
+          return;
+        }
+        setStatus(getErrorMessage('Supabase \uC5F0\uACB0\uC744 \uD655\uC778\uD574\uC8FC\uC138\uC694.', error), 'error');
+        console.error(error);
+      } finally {
+        if (loadingSessionKey === sessionKey) {
+          loadingSessionKey = '';
+        }
+      }
+    }
+
+    function enterSignedOutState(message = '', state = 'info') {
+      activeLoadToken += 1;
+      handledSessionKey = '';
+      loadingSessionKey = '';
+      currentSession = null;
+      currentUserId = '';
+      habits = [];
+      renderHabits();
+      setAppReady(false);
+      setStatus('');
+      userEmail.textContent = '';
+      appShell.hidden = true;
+      authScreen.hidden = false;
+      setAuthReady(Boolean(supabase));
+      setAuthStatus(message, state);
+
+      window.requestAnimationFrame(() => {
+        if (!authEmail.disabled) {
+          authEmail.focus();
+        }
+      });
+    }
+
+    authModeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        setAuthMode(button.dataset.authMode);
+      });
+    });
+
+    authForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+
+      if (!supabase) {
+        setAuthStatus('Supabase \uD658\uACBD \uBCC0\uC218\uB97C \uC124\uC815\uD574\uC8FC\uC138\uC694.', 'error');
+        return;
+      }
+
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      if (!email || !password) {
+        return;
+      }
+
+      setAuthSubmitting(true);
+      setAuthStatus('');
+
+      try {
+        if (authMode === 'signup') {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+
+          if (error) {
+            throw error;
+          }
+
+          if (data.session) {
+            await enterAuthenticatedState(data.session);
+          } else {
+            setAuthMode('login');
+            setAuthStatus('\uAC00\uC785 \uD655\uC778 \uC774\uBA54\uC77C\uC744 \uBCF4\uB0C8\uC2B5\uB2C8\uB2E4. \uC774\uBA54\uC77C \uD655\uC778 \uD6C4 \uB85C\uADF8\uC778\uD574\uC8FC\uC138\uC694.');
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+          if (error) {
+            throw error;
+          }
+
+          if (data.session) {
+            await enterAuthenticatedState(data.session);
+          }
+        }
+      } catch (error) {
+        const action = authMode === 'signup'
+          ? '\uD68C\uC6D0\uAC00\uC785\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.'
+          : '\uB85C\uADF8\uC778\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.';
+        setAuthStatus(getErrorMessage(action, error), 'error');
+        console.error(error);
+      } finally {
+        setAuthSubmitting(false);
+      }
+    });
+
+    signOutButton.addEventListener('click', async () => {
+      if (!supabase) {
+        return;
+      }
+
+      signOutButton.disabled = true;
+
+      try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+          throw error;
+        }
+
+        enterSignedOutState();
+      } catch (error) {
+        setStatus(getErrorMessage('\uB85C\uADF8\uC544\uC6C3\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.', error), 'error');
+        console.error(error);
+      } finally {
+        signOutButton.disabled = false;
+      }
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      if (!isReady) {
+        return;
+      }
+
       const habitName = input.value.trim();
 
       if (!habitName) {
         return;
       }
 
-      habits = [
-        { id: makeId(), name: habitName, completed: {} },
-        ...habits
-      ];
-      saveHabits();
-      input.value = "";
+      const temporaryHabit = { id: makeId(), name: habitName, completed: {} };
+
+      habits = [temporaryHabit, ...habits];
+      input.value = '';
       renderHabits();
+
+      if (submitButton) {
+        submitButton.disabled = true;
+      }
+
+      try {
+        const savedHabit = await createHabit(habitName);
+        habits = habits.map((habit) => habit.id === temporaryHabit.id ? savedHabit : habit);
+        setStatus('');
+      } catch (error) {
+        habits = habits.filter((habit) => habit.id !== temporaryHabit.id);
+        setStatus(getErrorMessage('\uC2B5\uAD00\uC744 \uC800\uC7A5\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.', error), 'error');
+        console.error(error);
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+        }
+
+        renderHabits();
+        input.focus();
+      }
     });
 
-    renderHabits();
+    async function initialize() {
+      setAuthMode('login');
+      setAppReady(false);
+      setAuthReady(false);
+      renderHabits();
+
+      if (!supabase) {
+        enterSignedOutState('Supabase \uD658\uACBD \uBCC0\uC218\uB97C \uC124\uC815\uD574\uC8FC\uC138\uC694.', 'error');
+        setAuthReady(false);
+        return;
+      }
+
+      setAuthStatus('\uC138\uC158\uC744 \uD655\uC778\uD558\uB294 \uC911\uC785\uB2C8\uB2E4.');
+      supabase.auth.onAuthStateChange((_event, session) => {
+        window.setTimeout(() => {
+          if (session && session.user) {
+            void enterAuthenticatedState(session);
+          } else {
+            enterSignedOutState();
+          }
+        }, 0);
+      });
+
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data.session && data.session.user) {
+          await enterAuthenticatedState(data.session);
+        } else {
+          enterSignedOutState();
+        }
+      } catch (error) {
+        enterSignedOutState(getErrorMessage('Supabase \uC778\uC99D \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4.', error), 'error');
+        console.error(error);
+      }
+    }
+
+    initialize();
   </script>
 </body>
 </html>

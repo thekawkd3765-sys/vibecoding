@@ -27,7 +27,6 @@ coverage/
 # Environment files
 .env
 .env.*
-!.env.example
 
 # Local automation/config directories
 .agents/
@@ -35,3 +34,4 @@ coverage/
 
 .vercel
 .env*
+!.env.example
